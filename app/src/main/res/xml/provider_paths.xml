@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Grant access to the app's private file directory -->
+    <files-path
+        name="my_files"
+        path="." />
+
+    <!-- Grant access to the app's cache directory -->
+    <cache-path
+        name="my_cache"
+        path="." />
+        
+    <!-- Grant access to external storage's public Downloads directory -->
+    <external-path
+        name="my_downloads"
+        path="." />
+</paths>

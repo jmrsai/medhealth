@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "517771751528",
+    "project_id": "medhealth-91023",
+    "storage_bucket": "medhealth-91023.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517771751528:android:d84c9db648d4d81c938bdd",
+        "android_client_info": {
+          "package_name": "com.jmr.medhealth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517771751528-mm0mv7907hpmo66qsn9e96s2grr4dqpq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jmr.medhealth",
+            "certificate_hash": "2dad9019e1ee6ad2b56b642c19733b0655e30c69"
+          }
+        },
+        {
+          "client_id": "517771751528-pve312c4ti9n0rrpkd9pr25l4ib1ccco.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBt5n-CXMNU63eMUkN9Qe2pRz7z9zikCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517771751528-pve312c4ti9n0rrpkd9pr25l4ib1ccco.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
