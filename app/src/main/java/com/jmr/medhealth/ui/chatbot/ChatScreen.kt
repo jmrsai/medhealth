@@ -1,93 +1,53 @@
 package com.jmr.medhealth.ui.chatbot
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jmr.medhealth.data.repository.ChatMessage
+import com.jmr.medhealth.data.repository.ChatRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@Composable
-fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsState()
-    var text by remember { mutableStateOf("") }
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
+data class ChatUiState(
+    val messages: List<ChatMessage> = emptyList(),
+    val isLoading: Boolean = false
+)
 
-    LaunchedEffect(uiState.messages.size) {
-        if (uiState.messages.isNotEmpty()) {
-            coroutineScope.launch {
-                listState.animateScrollToItem(uiState.messages.size - 1)
-            }
-        }
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val chatRepository: ChatRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ChatUiState())
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        val initialMessages = listOf(
+            ChatMessage("Hello! I'm your AI Health Agent. How can I help you today?", isFromUser = false)
+        )
+        _uiState.value = _uiState.value.copy(messages = initialMessages)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(vertical = 8.dp)
-        ) {
-            items(uiState.messages) { message ->
-                MessageBubble(message = message)
-            }
-        }
+    fun sendMessage(text: String) {
+        if (text.isBlank()) return
 
-        if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally))
-        }
+        val userMessage = ChatMessage(text, isFromUser = true)
+        _uiState.value = _uiState.value.copy(
+            messages = _uiState.value.messages + userMessage,
+            isLoading = true
+        )
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Ask a health question...") }
+        viewModelScope.launch {
+            val result = chatRepository.sendMessage(text)
+            val botMessage = result.fold(
+                onSuccess = { ChatMessage(it, isFromUser = false) },
+                onFailure = { ChatMessage("Sorry, an error occurred: ${it.message}", isFromUser = false) }
             )
-            IconButton(onClick = {
-                viewModel.sendMessage(text)
-                text = ""
-            }, enabled = text.isNotBlank() && !uiState.isLoading) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
-            }
-        }
-    }
-}
-
-@Composable
-fun MessageBubble(message: ChatMessage) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        horizontalArrangement = if (message.isFromUser) Arrangement.End else Arrangement.Start
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    if (message.isFromUser) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.surfaceVariant
-                )
-                .padding(12.dp)
-        ) {
-            Text(
-                text = message.text,
-                color = if (message.isFromUser) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.onSurfaceVariant
+            _uiState.value = _uiState.value.copy(
+                messages = _uiState.value.messages + botMessage,
+                isLoading = false
             )
         }
     }

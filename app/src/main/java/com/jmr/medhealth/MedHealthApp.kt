@@ -1,5 +1,4 @@
 package com.jmr.medhealth
-
 import android.app.Application
 import com.jmr.medhealth.data.repository.RemoteConfigRepository
 import dagger.hilt.android.HiltAndroidApp

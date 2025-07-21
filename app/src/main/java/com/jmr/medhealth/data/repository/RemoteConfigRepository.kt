@@ -33,7 +33,7 @@ class RemoteConfigRepository @Inject constructor() {
         remoteConfig.setDefaultsAsync(mapOf(
             AI_AGENT_PROMPT_KEY to DEFAULT_AI_AGENT_PROMPT
         ))
-    }
+    } // <-- THIS BRACE WAS LIKELY THE ONE MISSING
 
     /**
      * Asynchronously fetches the latest configuration values from the Firebase backend

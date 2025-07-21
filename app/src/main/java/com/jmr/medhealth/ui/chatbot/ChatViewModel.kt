@@ -17,14 +17,13 @@ data class ChatUiState(
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val chatRepository: ChatRepository // Assuming you add ChatRepository to your Hilt AppModule
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        // Add an initial greeting message from the bot
         val initialMessages = listOf(
             ChatMessage("Hello! I'm your AI Health Agent. How can I help you today?", isFromUser = false)
         )
@@ -34,7 +33,6 @@ class ChatViewModel @Inject constructor(
     fun sendMessage(text: String) {
         if (text.isBlank()) return
 
-        // Add user message to the UI immediately
         val userMessage = ChatMessage(text, isFromUser = true)
         _uiState.value = _uiState.value.copy(
             messages = _uiState.value.messages + userMessage,
